@@ -1,0 +1,214 @@
+---
+title: "Graded Assignment:Course_Practical Machine Learning Writeup project"
+author: "Shashikesh Mishra"
+date: "1 August 2017"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Index
+* An Introduction
+* Local machine directory and Enviroment setup
+* Data loading and Cleaning
+* Exploratory Data Analysis
+* Data Visualisation
+* Correlation Analysis
+* Model building
+* Conclusion
+
+# Synopsis
+One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, our goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants.
+
+### An Intro
+The goal of our project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. We may use any of the other variables to predict with. We should create a report describing how you built your model, how we used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.
+
+### Background
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement - a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
+
+### Data Source
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+The Training data set for this project is available here.
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+
+The test data set for this project is available here.
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv
+
+# Local machine directory and Enviroment setup
+
+```{r}
+rm(list = ls())
+setwd("C:/Users/sk_mi/Desktop/onlinelearning/Coursera/practicalmachinelearning")
+getwd()
+```
+
+```{r}
+set.seed(12345)
+library(caret)
+library(knitr)
+library(rpart)
+library(rpart.plot)
+library(rattle)
+library(randomForest)
+library(corrplot)
+library(repmis)
+```
+
+# Loading and Cleaning of data
+```{r}
+# Uploading data from respective site
+urlTrain<- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+urlTest<- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+```
+
+Now as we have downloaded data set from the site in to our enviroment, now let's creat read the data set and then we will creat partion of training data set in to two subset(60% & 30%) for our model building process. Test data set will remain untouched for our final result.
+
+```{r}
+# By using read.csv function we will read and view the downloaded data set.
+training<- read.csv(url(urlTrain))
+testing<- read.csv(url(urlTest))
+```
+
+```{r}
+# Let's creat a prtition in training data set.
+indata<- createDataPartition(training$classe, p = 0.7, list = FALSE)
+Train_data_set<- training[indata, ]
+Test_data_set<- training[-indata, ]
+dim(Train_data_set)
+dim(Test_data_set)
+```
+
+### Now we will remove near zero or NA values from both the data set.
+```{r}
+remove_NA<- nearZeroVar(Train_data_set)
+Train_data_set<- Train_data_set[, -remove_NA]
+Test_data_set<- Test_data_set[, -remove_NA]
+dim(Train_data_set)
+dim(Test_data_set)
+```
+
+```{r}
+# Let's remove variable which mostly contain NA
+NA_var<- sapply(Train_data_set, function(x) mean(is.na(x)))>0.95
+Train_data_set<- Train_data_set[, NA_var==FALSE]; Test_data_set<- Test_data_set[, NA_var==FALSE]
+dim(Train_data_set); dim(Test_data_set)
+
+#Just one more cleaning we are done.
+Train_data_set<- Train_data_set[, -(1:5)]; Test_data_set<- Test_data_set[, -(1:5)]  
+dim(Train_data_set); dim(Test_data_set) # by removing identification variables
+```
+Afterall removing all unnecessary variable from the data set we are left with 54 odd variable.
+
+## Exploratory data analysis
+under this we will explore the data to find correlation b/w variables. We will also visualize data set to understand the pattern of data set.
+```{r}
+corMatrix <- cor(Train_data_set[, -54])
+corrplot(corMatrix, order = "hclust", method = "ellipse", type = "lower", tl.cex = 0.6, tl.col = rgb(0, 0, 0))
+```
+
+Under this correlation plot, It's clearing visible that which variables are mostly correlated to each other. Thus moving further let's start building model in next step.
+??
+## Model Building to accomplish prediction.
+As we do remember that our goal is to creat a model in the manner that best suited to predict 20 different test cases.In order to accomplish this task we are going to use prediction medel such as RandomForest, Decision Tree and GB MOdel.
+
+### A. Decision Tree
+
+```{r}
+control <- trainControl(method = "cv", number = 3)
+fit_rpart <- train(classe ~ ., data = Train_data_set, method = "rpart", 
+                   trControl = control)
+print(fit_rpart, digits = 4)
+```
+
+```{r}
+fancyRpartPlot(fit_rpart$finalModel)
+```
+
+```{r}
+# Now we will predict outcomes using validation set
+predict_rpart <- predict(fit_rpart, Test_data_set)
+# Show prediction result
+(conf_rpart <- confusionMatrix(Test_data_set$classe, predict_rpart))
+```
+
+```{r}
+(accuracy_rpart <- conf_rpart$overall[1])
+```
+
+this is clearly visible that accuracy rate is 0.53 which is 50% around. so decision tree model is not suitalble for this predicton.
+Now next we will start with Randon forest.
+
+### B. Random Forest
+```{r}
+set.seed(12345)
+fitmod.rf<- train(classe ~., data = Train_data_set, method="rf", trControl=control)
+print(fitmod.rf, digits = 4)
+```
+
+```{r}
+# Now we will predict the outcomes using validation set
+predict_rf <- predict(fitmod.rf, Test_data_set)
+
+# Show prediction result
+(conf_rf <- confusionMatrix(Test_data_set$classe, predict_rf))
+```
+
+Now lets have a look on the accuracy of Random Forest model on overall data set.
+
+```{r}
+(accuracy_rf <- conf_rf$overall[1])
+```
+
+```{r}
+# Let's plot the Random Forest model on outcome variables.
+plot(conf_rf$table, col = conf_rf$byClass, 
+     main = paste("Random Forest - Accuracy =",
+                  round(conf_rf$overall['Accuracy'], 4)))
+
+```
+
+### C. Generalized Boosted Medel
+```{r}
+# Let's predict the train data set by using this final model
+set.seed(12345)
+controlgbm <- trainControl(method = "repeatedcv", number = 5, repeats = 1)
+fitmod.gbm  <- train(classe ~ ., data=Train_data_set, method = "gbm",trControl = controlgbm, verbose=FALSE)
+fitmod.gbm$finalModel
+```
+
+```{r}
+# Let's predict the outcome on test data set
+predict_gbm<- predict(fitmod.gbm, Test_data_set)
+(conf_gbm<- confusionMatrix(Test_data_set$classe, predict_gbm))
+```
+
+```{r}
+# Let's plot the GBM on outcome variables.
+plot(conf_gbm$table, col = conf_gbm$byClass, 
+     main = paste("GBM - Accuracy =", round(conf_gbm$overall['Accuracy'], 4)))
+```
+
+# Conclusion
+as we can see the accuracy rate for Random Forest is 0.9965 which is more accurate than decision tree & GBM. This may be because the variable are much more correlated with each other in model. Thus, it leads us to our highest accuracy rate with final result. 
+
+The accuracy result of all three regression models are listed below;
+Random Forest : 0.9963
+Decision Tree : 0.7368
+GBM : 0.9839
+
+```{r}
+# Noe Let's apply best suited model to test data set.
+(predict(fitmod.rf, testing))
+```
+
+
+
+
+
+
+
+
+
+
