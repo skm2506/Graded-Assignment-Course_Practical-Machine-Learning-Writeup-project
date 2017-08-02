@@ -201,7 +201,7 @@ print(fit_rpart, digits = 4)
 fancyRpartPlot(fit_rpart$finalModel)
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+![Rplot-11-1.png](https://github.com/skm2506/Graded-Assignment-Course_Practical-Machine-Learning-Writeup-project/blob/master/figures-html/Rplot-11-1.png)
 
 
 ```r
@@ -350,7 +350,7 @@ plot(conf_rf$table, col = conf_rf$byClass,
                   round(conf_rf$overall['Accuracy'], 4)))
 ```
 
-![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
+![Rplot-17-1.png](https://github.com/skm2506/Graded-Assignment-Course_Practical-Machine-Learning-Writeup-project/blob/master/figures-html/Rplot-17-1.png)
 
 ### C. Generalized Boosted Medel
 
@@ -416,7 +416,7 @@ plot(conf_gbm$table, col = conf_gbm$byClass,
      main = paste("GBM - Accuracy =", round(conf_gbm$overall['Accuracy'], 4)))
 ```
 
-![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
+![Rplot-20-1.png](https://github.com/skm2506/Graded-Assignment-Course_Practical-Machine-Learning-Writeup-project/blob/master/figures-html/Rplot-20-1.png)
 
 # Conclusion
 as we can see the accuracy rate for Random Forest is 0.9965 which is more accurate than decision tree & GBM. This may be because the variable are much more correlated with each other in model. Thus, it leads us to our highest accuracy rate with final result. 
@@ -436,15 +436,3 @@ GBM : 0.9839
 ##  [1] B A B A A E D B A A B C B A E E A B B B
 ## Levels: A B C D E
 ```
-
-
-
-
-
-
-
-
-
-
-
-
