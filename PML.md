@@ -158,7 +158,7 @@ corMatrix <- cor(Train_data_set[, -54])
 corrplot(corMatrix, order = "hclust", method = "ellipse", type = "lower", tl.cex = 0.6, tl.col = rgb(0, 0, 0))
 ```
 
-![Rplot-11-1.png](./Graded-Assignment-Course_Practical-Machine-Learning-Writeup-project/figures-html/Rplot-11-1.png )
+![Rplot-9-1.png](https://github.com/skm2506/Graded-Assignment-Course_Practical-Machine-Learning-Writeup-project/blob/master/figures-html/Rplot-9-1.png)
 
 Under this correlation plot, It's clearing visible that which variables are mostly correlated to each other. Thus moving further let's start building model in next step.
 ??
