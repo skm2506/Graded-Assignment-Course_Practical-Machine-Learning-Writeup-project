@@ -158,7 +158,7 @@ corMatrix <- cor(Train_data_set[, -54])
 corrplot(corMatrix, order = "hclust", method = "ellipse", type = "lower", tl.cex = 0.6, tl.col = rgb(0, 0, 0))
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+![plot of chunk unnamed-chunk-9](figures/unnamed-chunk-9-1.png)
 
 Under this correlation plot, It's clearing visible that which variables are mostly correlated to each other. Thus moving further let's start building model in next step.
 ??
@@ -201,7 +201,8 @@ print(fit_rpart, digits = 4)
 fancyRpartPlot(fit_rpart$finalModel)
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-11](figures/unnamed-chunk-11-1.png)
+
 
 
 ```r
@@ -350,7 +351,7 @@ plot(conf_rf$table, col = conf_rf$byClass,
                   round(conf_rf$overall['Accuracy'], 4)))
 ```
 
-![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
+![plot of chunk unnamed-chunk-17](figures/unnamed-chunk-17-1.png)
 
 ### C. Generalized Boosted Medel
 
@@ -416,7 +417,7 @@ plot(conf_gbm$table, col = conf_gbm$byClass,
      main = paste("GBM - Accuracy =", round(conf_gbm$overall['Accuracy'], 4)))
 ```
 
-![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-20](figures/unnamed-chunk-20-1.png)
 
 # Conclusion
 as we can see the accuracy rate for Random Forest is 0.9965 which is more accurate than decision tree & GBM. This may be because the variable are much more correlated with each other in model. Thus, it leads us to our highest accuracy rate with final result. 
